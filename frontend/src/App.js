@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import React from "react";
-import { publicRoute } from "./routes";
+import Admin from "./pages/Admin";
+import { publicRoute, privateRoute } from "./routes";
 function App() {
   return (
     <div>
@@ -16,6 +17,7 @@ function App() {
 
 
           })}
+          <Route path="/admin/*" element={<Admin />}></Route>
 
         </Routes>
       </BrowserRouter>

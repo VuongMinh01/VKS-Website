@@ -1,9 +1,14 @@
 import Home from "../pages/Home";
 import Login from "../pages/Login";
-const privateRoute = []
-const publicRoute = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
+import Admin from "../pages/Admin";
 
-]
-export { privateRoute, publicRoute }
+const privateRoute = [
+    { path: '/admin', component: Admin },  // Chỉ cho phép admin truy cập
+];
+
+const publicRoute = [
+    { path: '/', component: Home },  // Trang công khai (home)
+    { path: '/login', component: Login },  // Trang đăng nhập
+];
+
+export { privateRoute, publicRoute };

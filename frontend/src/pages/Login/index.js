@@ -11,6 +11,7 @@ export default function Login() {
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) {
+            // Nếu đã đăng nhập và có user, chuyển hướng theo role
             navigate(user.role === "admin" ? "/admin" : "/");
         }
     }, [navigate]);
@@ -34,7 +35,7 @@ export default function Login() {
 
         const users = {
             admin: { email: "admin", password: "admin123", role: "admin" },
-            user: { email: "userVKS@gmail.com", password: "userVKS123", role: "user" }
+            user: { email: "userVKS@gmail.com", password: "userVKS123", role: "user" },
         };
 
         const user = Object.values(users).find(
@@ -48,6 +49,7 @@ export default function Login() {
             toast.error("Sai thông tin đăng nhập.");
         }
     };
+
 
     return (
         <div className="mainContainer">
