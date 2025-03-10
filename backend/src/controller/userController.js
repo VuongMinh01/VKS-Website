@@ -3,14 +3,41 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // Đăng ký user mới
+// export const registerUser = async (req, res) => {
+//     try {
+//         const { username, email, password, phone, role } = req.body;
+
+//         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+//         if (existingUser) return res.status(400).json({ message: "Email hoặc username đã tồn tại!" });
+
+//         const hashedPassword = await bcrypt.hash(password, 10);
+
+//         const newUser = new User({
+//             username,
+//             email,
+//             password: hashedPassword,
+//             phone,
+//             role: role === "admin" ? "admin" : "user",
+//         });
+
+//         await newUser.save();
+//         res.status(201).json({ message: "Đăng ký thành công!", user: newUser });
+//     } catch (error) {
+//         res.status(500).json({ message: "Lỗi server!", error });
+//     }
+// };
+
 export const registerUser = async (req, res) => {
     try {
         const { username, email, password, phone, role } = req.body;
+
+        console.log("📥 Dữ liệu nhận được:", req.body);
 
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) return res.status(400).json({ message: "Email hoặc username đã tồn tại!" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("🔑 Mật khẩu đã mã hóa:", hashedPassword);
 
         const newUser = new User({
             username,
@@ -21,9 +48,13 @@ export const registerUser = async (req, res) => {
         });
 
         await newUser.save();
+        console.log("✅ Người dùng đã đăng ký thành công:", newUser);
+
         res.status(201).json({ message: "Đăng ký thành công!", user: newUser });
+
     } catch (error) {
-        res.status(500).json({ message: "Lỗi server!", error });
+        console.error("❌ Lỗi khi đăng ký:", error); // In lỗi ra log
+        res.status(500).json({ message: "Lỗi server!", error: error.message }); // Trả về lỗi chi tiết
     }
 };
 

@@ -1,24 +1,27 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/connectDB.js";
-import mongoose from "mongoose";
-import userRoutes from "./routes/v1/userRoute.js"
+import connectDB from "./config/connectDB.js";  // ❗ Chỉ giữ dòng này, không cần `mongoose.connect()`
+import userRoutes from "./routes/v1/userRoute.js";
 import congVanRoutes from "./routes/v1/congVanRoute.js";
-
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log("✅ MongoDB Connected Successfully"))
-    .catch(err => console.log("❌ MongoDB Connection Failed:", err.message));
-
-
+import axios from "axios";
 
 // Load biến môi trường từ .env
 dotenv.config();
+
+// Lấy IP Public để debug
+const getPublicIP = async () => {
+    try {
+        const res = await axios.get("https://api64.ipify.org?format=json");
+        console.log(`🌐 Public Render IP: ${res.data.ip}`);
+    } catch (error) {
+        console.error("❌ Lỗi lấy IP:", error);
+    }
+};
+getPublicIP();
+
 // Kết nối MongoDB Atlas
-connectDB();
+connectDB();  // ❗ Dùng connectDB() thay vì mongoose.connect()
 
 const app = express();
 const PORT = process.env.PORT || 8017;
