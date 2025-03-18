@@ -6,9 +6,10 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.get("/", verifyToken, getAllUsers);
 router.get("/:id", verifyToken, getUserById);
 router.put("/:id", verifyToken, updateUser);
 router.delete("/:id", verifyToken, verifyAdmin, deleteUser); // Chỉ admin mới có thể xóa user
-router.get("/getAllUsers", verifyToken, getAllUsers);
+
 
 export default router;
