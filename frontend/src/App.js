@@ -1,27 +1,30 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import React from "react";
 import Admin from "./pages/Admin";
-import { publicRoute, privateRoute } from "./routes";
+import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute
+import { publicRoute } from "./routes";
+
 function App() {
   return (
-    <div>
-      <BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        {/* Các route công khai */}
+        {publicRoute.map((route, index) => {
+          const Page = route.component;
+          return <Route key={index} path={route.path} element={<Page />} />;
+        })}
 
-        <Routes>
-
-
-
-          {publicRoute.map((route, index) => {
-            const Page = route.component;
-            return <Route key={index} path={route.path} element={<Page />} />
-
-
-          })}
-          <Route path="/admin/*" element={<Admin />}></Route>
-
-        </Routes>
-      </BrowserRouter>
-    </div>
+        {/* Route admin - chỉ dành cho admin */}
+        <Route
+          path="/admin/*"
+          element={
+            <PrivateRoute role="admin">
+              <Admin />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../../css/Login.css";
-
+import { loginRoute } from "../../utils";
 export default function Login() {
     const [values, setValues] = useState({ email: "", password: "" });
     const navigate = useNavigate();
@@ -11,7 +12,6 @@ export default function Login() {
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) {
-            // Nếu đã đăng nhập và có user, chuyển hướng theo role
             navigate(user.role === "admin" ? "/admin" : "/");
         }
     }, [navigate]);
@@ -29,26 +29,37 @@ export default function Login() {
         return true;
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         if (!handleValidation()) return;
 
-        const users = {
-            admin: { email: "admin", password: "admin123", role: "admin" },
-            user: { email: "userVKS@gmail.com", password: "userVKS123", role: "user" },
-        };
+        try {
+            const response = await axios.post(loginRoute, values);
+            console.log("Phản hồi từ API:", response.data);
 
-        const user = Object.values(users).find(
-            (u) => u.email === values.email && u.password === values.password
-        );
+            const { message, token, user } = response.data;
 
-        if (user) {
-            localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role }));
-            navigate(user.role === "admin" ? "/admin" : "/");
-        } else {
-            toast.error("Sai thông tin đăng nhập.");
+            if (token && user) {
+                // Lưu token và user vào localStorage
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role }));
+
+                toast.success(message || "Đăng nhập thành công!");
+
+                // Điều hướng dựa theo role
+                setTimeout(() => {
+                    navigate(user.role === "admin" ? "/admin" : "/");
+                }, 1500); // Đợi toast hiển thị xong
+            } else {
+                toast.error("Dữ liệu phản hồi không hợp lệ!");
+            }
+        } catch (error) {
+            console.error("Lỗi từ API:", error.response?.data || error);
+            toast.error(error.response?.data?.message || "Lỗi hệ thống, vui lòng thử lại!");
         }
     };
+
+
 
 
     return (

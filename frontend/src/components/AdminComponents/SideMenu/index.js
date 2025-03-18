@@ -52,6 +52,11 @@ export default function SideMenu() {
                         key: "/admin/congvan",
                     },
                     {
+                        label: "Tài khoản",
+                        icon: <DatabaseOutlined />,
+                        key: "/admin/taikhoan",
+                    },
+                    {
                         label: "Đăng xuất",
                         key: "/signout",
                         icon: <LogoutOutlined />,
