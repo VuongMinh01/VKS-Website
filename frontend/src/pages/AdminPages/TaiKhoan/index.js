@@ -60,26 +60,104 @@ export default function TaiKhoan() {
         }
     };
 
+    // return (
+    //     <div>
+    //         <Space size={20} direction="vertical" style={{ width: "100%" }}>
+    //             <Space direction="horizontal" style={{ justifyContent: "space-between", width: "100%" }}>
+    //                 <Typography.Title level={4}>Danh sách người dùng</Typography.Title>
+    //                 <Button type="primary" onClick={() => setIsModalAddOpen(true)}>
+    //                     Tạo tài khoản
+    //                 </Button>
+    //             </Space>
+
+    //             <Table
+    //                 columns={[
+    //                     { key: "1", title: "ID", dataIndex: "_id" },
+    //                     { key: "2", title: "Tên", dataIndex: "username" },
+    //                     { key: "3", title: "Email", dataIndex: "email" },
+    //                     { key: "4", title: "Số điện thoại", dataIndex: "phone" },
+    //                     { key: "5", title: "Vai trò", dataIndex: "role" },
+    //                     {
+    //                         key: "6",
+    //                         title: "Hành động",
+    //                         render: (text, record) => (
+    //                             <Button danger onClick={() => handleDeleteUser(record._id)}>
+    //                                 Xóa
+    //                             </Button>
+    //                         ),
+    //                     },
+    //                 ]}
+    //                 dataSource={dataSource}
+    //                 rowKey="_id"
+    //                 pagination={{ pageSize: 10 }}
+    //             />
+    //         </Space>
+
+    //         {/* Modal thêm tài khoản */}
+    //         <Modal
+    //             title="Tạo tài khoản mới"
+    //             open={isModalAddOpen}
+    //             onCancel={() => setIsModalAddOpen(false)}
+    //             onOk={handleCreateAccount}
+    //             okText="Tạo"
+    //             cancelText="Hủy"
+    //         >
+    //             <Form form={form} layout="vertical">
+    //                 <Form.Item name="username" label="Tên người dùng" rules={[{ required: true, message: "Vui lòng nhập tên!" }]}>
+    //                     <Input />
+    //                 </Form.Item>
+    //                 <Form.Item name="email" label="Email" rules={[{ required: true, type: "email", message: "Vui lòng nhập email hợp lệ!" }]}>
+    //                     <Input />
+    //                 </Form.Item>
+    //                 <Form.Item name="phone" label="Số điện thoại">
+    //                     <Input />
+    //                 </Form.Item>
+    //                 <Form.Item name="password" label="Mật khẩu" rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}>
+    //                     <Input.Password />
+    //                 </Form.Item>
+    //                 <Form.Item name="role" label="Vai trò" initialValue="user">
+    //                     <Select>
+    //                         <Select.Option value="user">User</Select.Option>
+    //                         <Select.Option value="admin">Admin</Select.Option>
+    //                     </Select>
+    //                 </Form.Item>
+    //             </Form>
+    //         </Modal>
+
+    //         <ToastContainer />
+    //     </div>
+    // );
     return (
-        <div>
+        <div style={{ padding: 16 }}>
             <Space size={20} direction="vertical" style={{ width: "100%" }}>
-                <Space direction="horizontal" style={{ justifyContent: "space-between", width: "100%" }}>
-                    <Typography.Title level={4}>Danh sách người dùng</Typography.Title>
+                {/* Tiêu đề và nút thêm tài khoản */}
+                <Space
+                    direction="horizontal"
+                    style={{
+                        justifyContent: "space-between",
+                        width: "100%",
+                        flexWrap: "wrap", // ✅ Để tránh vỡ layout trên mobile
+                        gap: 10, // ✅ Khoảng cách giữa các phần tử
+                    }}
+                >
+                    <Typography.Title level={4} style={{ margin: 0 }}>Danh sách người dùng</Typography.Title>
                     <Button type="primary" onClick={() => setIsModalAddOpen(true)}>
                         Tạo tài khoản
                     </Button>
                 </Space>
 
+                {/* Bảng danh sách người dùng */}
                 <Table
                     columns={[
-                        { key: "1", title: "ID", dataIndex: "_id" },
-                        { key: "2", title: "Tên", dataIndex: "username" },
-                        { key: "3", title: "Email", dataIndex: "email" },
-                        { key: "4", title: "Số điện thoại", dataIndex: "phone" },
-                        { key: "5", title: "Vai trò", dataIndex: "role" },
+                        { key: "1", title: "ID", dataIndex: "_id", width: 100 },
+                        { key: "2", title: "Tên", dataIndex: "username", width: 150 },
+                        { key: "3", title: "Email", dataIndex: "email", width: 200 },
+                        { key: "4", title: "Số điện thoại", dataIndex: "phone", width: 150 },
+                        { key: "5", title: "Vai trò", dataIndex: "role", width: 100 },
                         {
                             key: "6",
                             title: "Hành động",
+                            width: 100,
                             render: (text, record) => (
                                 <Button danger onClick={() => handleDeleteUser(record._id)}>
                                     Xóa
@@ -90,6 +168,7 @@ export default function TaiKhoan() {
                     dataSource={dataSource}
                     rowKey="_id"
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: "max-content" }} // ✅ Cho phép cuộn ngang trên mobile
                 />
             </Space>
 
@@ -127,4 +206,5 @@ export default function TaiKhoan() {
             <ToastContainer />
         </div>
     );
+
 }

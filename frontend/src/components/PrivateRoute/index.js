@@ -1,20 +1,29 @@
-// src/components/PrivateRoute.js
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const PrivateRoute = ({ children, role }) => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const [user, setUser] = useState(() => {
+        return JSON.parse(localStorage.getItem("user")) || null;
+    });
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setUser(JSON.parse(localStorage.getItem("user")));
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
 
     if (!user) {
-        // Nếu người dùng không đăng nhập, chuyển hướng đến trang login
-        return <Navigate to="/login" />;
+        return <Navigate to="/login" replace />;
     }
 
-    // Kiểm tra nếu user có role đúng với yêu cầu
     if (user.role !== role) {
-        // Nếu người dùng không phải admin, chuyển hướng về trang chính
-        return <Navigate to="/" />;
+        return <Navigate to="/" replace />;
     }
 
     return children;

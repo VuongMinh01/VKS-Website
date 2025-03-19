@@ -41,6 +41,7 @@ export default function SideMenu() {
             </Card>
             <Menu
                 mode="inline"
+                style={{ minWidth: 200 }} // Đảm bảo menu không bị quá hẹp
                 onClick={handleMenuClick}
                 items={[
                     {

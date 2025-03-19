@@ -4,7 +4,7 @@ import { Input, Table, Button, Row, Col } from "antd";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
-
+import { message } from "antd";
 const API_URL = "https://vks-website.onrender.com/api/congvan/all";
 const MAX_LENGTH = 100; // Giới hạn ký tự hiển thị ban đầu
 
@@ -36,9 +36,16 @@ export default function HomePage() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
+        const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+        if (confirmLogout) {
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            message.success("Đăng xuất thành công!");
+            setTimeout(() => navigate("/login"), 1000);
+        }
     };
+
+
 
     const toggleExpand = (record) => {
         setExpandedRowKeys((prev) =>

@@ -7,25 +7,38 @@ export default function Header() {
         <Container
             fluid
             style={{
-                backgroundColor: "#b22222", // Nền đỏ đậm
-                backgroundImage: `url(${VKSLogo})`,
-                backgroundSize: "contain", // Hiển thị logo rõ nét
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "left center", // Căn trái cho logo
-                height: "150px", // Điều chỉnh chiều cao hợp lý
+                backgroundColor: "#b22222", // Màu nền đỏ
+                height: "150px", // Chiều cao hợp lý
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                textAlign: "center",
-                fontWeight: "bold",
-                fontSize: "24px",
-                borderBottom: "4px solid #8B0000" // Viền dưới đậm hơn
+                borderBottom: "4px solid #8B0000", // Viền dưới
+                padding: "10px 20px"
             }}
         >
-            <Row className="w-100">
-                <Col xs={12} className="text-center">
-                    <h1 style={{ color: 'blue' }}>VIỆN KIỂM SÁT NHÂN DÂN HUYỆN HÓC MÔN</h1>
+            <Row className="w-100 align-items-center">
+                {/* Cột logo */}
+                <Col xs={3} sm={2} className="d-flex justify-content-center">
+                    <img
+                        src={VKSLogo}
+                        alt="VKS Logo"
+                        style={{ maxWidth: "100%", height: "auto" }}
+                    />
+                </Col>
+
+                {/* Cột tiêu đề */}
+                <Col xs={9} sm={10} className="text-center">
+                    <h1
+                        className="text-wrap text-break"
+                        style={{
+                            color: "white",
+                            fontSize: "clamp(16px, 4vw, 24px)", // Responsive font-size
+                            fontWeight: "bold",
+                            margin: 0,
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        VIỆN KIỂM SÁT NHÂN DÂN HUYỆN HÓC MÔN
+                    </h1>
                 </Col>
             </Row>
         </Container>

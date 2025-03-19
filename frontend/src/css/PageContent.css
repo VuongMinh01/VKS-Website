@@ -1,0 +1,22 @@
+.PageContent {
+    width: 100%;
+    max-width: 1200px;
+    /* Hoặc giá trị phù hợp */
+    margin: 0 auto;
+    /* Căn giữa */
+    padding: 16px;
+    /* Tạo khoảng cách */
+    font-size: 14px;
+
+}
+
+@media (max-width: 768px) {
+    .PageContent {
+        padding: 8px;
+        /* Giảm padding trên màn hình nhỏ */
+    }
+}
+
+.PageContent h1 {
+    font-size: 20px;
+}

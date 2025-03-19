@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Row, Col, Form, Input, Button, Card, message } from "antd";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../../css/Login.css";
 import { loginRoute } from "../../utils";
+import "../../css/Login.css"
 export default function Login() {
     const [values, setValues] = useState({ email: "", password: "" });
     const navigate = useNavigate();
@@ -40,63 +41,78 @@ export default function Login() {
             const { message, token, user } = response.data;
 
             if (token && user) {
-                // Lưu token và user vào localStorage
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role }));
-
                 toast.success(message || "Đăng nhập thành công!");
-
-                // Điều hướng dựa theo role
-                setTimeout(() => {
-                    navigate(user.role === "admin" ? "/admin" : "/");
-                }, 1500); // Đợi toast hiển thị xong
+                navigate(user.role === "admin" ? "/admin" : "/"); // Điều hướng ngay lập tức
             } else {
                 toast.error("Dữ liệu phản hồi không hợp lệ!");
             }
+
         } catch (error) {
             console.error("Lỗi từ API:", error.response?.data || error);
             toast.error(error.response?.data?.message || "Lỗi hệ thống, vui lòng thử lại!");
         }
     };
 
-
-
-
     return (
-        <div className="mainContainer">
-            <div className="Login">
-                <h2 className="titleContainer">Đăng nhập</h2>
-                <div className="inputContainer">
-                    <input
-                        className="inputBox"
-                        type="text"
-                        name="email"
-                        placeholder="Tên đăng nhập"
-                        onChange={(e) => setValues({ ...values, email: e.target.value })}
-                    />
-                </div>
-                <div className="inputContainer">
-                    <input
-                        className="inputBox"
-                        type="password"
-                        name="password"
-                        placeholder="Mật khẩu"
-                        onChange={(e) => setValues({ ...values, password: e.target.value })}
-                    />
-                </div>
-                <div className="inputContainer">
-                    <button type="submit" onClick={handleLogin}>Đăng nhập</button>
-                </div>
-                <div className="login-links">
-                    <p>
+        <Row
+            justify="center"
+            align="middle"
+            style={{
+                minHeight: "100vh",
+                backgroundColor: "cornflowerblue",
+                display: "flex",
+                padding: "20px",
+            }}
+        >
+            <Col xs={22} sm={16} md={12} lg={8}>
+                <Card
+                    title={
+                        <h2 style={{
+                            fontSize: "32px",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            color: "cornflowerblue"
+                        }}>
+                            Đăng nhập
+                        </h2>
+                    }
+                    bordered={false}
+                    style={{
+                        borderRadius: 10,
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    }}
+                >
+
+                    <Form layout="vertical">
+                        <Form.Item label="Tên đăng nhập">
+                            <Input
+                                placeholder="Nhập email"
+                                onChange={(e) => setValues({ ...values, email: e.target.value })}
+                            />
+                        </Form.Item>
+                        <Form.Item label="Mật khẩu">
+                            <Input.Password
+                                placeholder="Nhập mật khẩu"
+                                onChange={(e) => setValues({ ...values, password: e.target.value })}
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" block onClick={handleLogin}>
+                                Đăng nhập
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    <p style={{ textAlign: "center", marginTop: "10px" }}>
                         Bạn chưa có tài khoản? <a href="/register">Đăng ký</a>
                     </p>
-                    <p>
+                    <p style={{ textAlign: "center" }}>
                         Quên mật khẩu? <a href="/forgetPassword">Khôi phục</a>
                     </p>
-                </div>
-            </div>
+                </Card>
+            </Col>
             <ToastContainer />
-        </div>
+        </Row>
     );
 }

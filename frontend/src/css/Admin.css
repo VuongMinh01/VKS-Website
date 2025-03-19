@@ -1,0 +1,12 @@
+.side-menu-col {
+    position: relative;
+    z-index: 10;
+    background: white;
+    /* Để menu không bị mờ khi nội dung đè lên */
+}
+
+.content-col {
+    overflow-x: hidden;
+    /* Tránh nội dung tràn */
+    padding: 15px;
+}
