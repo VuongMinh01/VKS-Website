@@ -1,24 +1,33 @@
 import React, { useState } from "react";
-import { Menu } from "antd";
+import { Menu, message, Avatar, Card } from "antd";
 import { HomeOutlined, LogoutOutlined, DatabaseOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Card } from "antd";
+import { useNavigate } from "react-router-dom";
 
 export default function SideMenu() {
     const { Meta } = Card;
-    const [loading, setLoading] = useState(false);
-
     const navigate = useNavigate();
 
     // Lấy thông tin người dùng từ localStorage
     const userData = JSON.parse(localStorage.getItem("user"));
 
-    // Kiểm tra nếu userData không tồn tại hoặc không có thông tin role
+    // Kiểm tra nếu userData không tồn tại
     if (!userData) {
-        // Nếu không có userData, có thể điều hướng đến trang login hoặc một hành động khác
         navigate("/login");
         return null;
     }
+
+    const handleMenuClick = (item) => {
+        if (item.key === "/signout") {
+            const confirmLogout = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+            if (confirmLogout) {
+                localStorage.clear();
+                message.success("Đăng xuất thành công!"); // Hiển thị thông báo
+                setTimeout(() => navigate("/login"), 1000); // Điều hướng sau 1 giây
+            }
+        } else {
+            navigate(item.key);
+        }
+    };
 
     return (
         <div className="SideMenu">
@@ -32,14 +41,7 @@ export default function SideMenu() {
             </Card>
             <Menu
                 mode="inline"
-                onClick={(item) => {
-                    if (item.key === "/signout") {
-                        localStorage.clear();
-                        navigate("/login");
-                    } else {
-                        navigate(item.key);
-                    }
-                }}
+                onClick={handleMenuClick}
                 items={[
                     {
                         label: "Trang cá nhân",
@@ -62,7 +64,7 @@ export default function SideMenu() {
                         icon: <LogoutOutlined />,
                     },
                 ]}
-            ></Menu>
+            />
         </div>
     );
 }

@@ -3,7 +3,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Admin from "../../../pages/Admin"; // Import trang admin của bạn
-import Home from "../../../pages/Home"; // Import trang home
+import Home from "../../../pages/HomePage"; // Import trang home
 import PrivateRoute from "../../PrivateRoute"; // Import PrivateRoute để bảo vệ route
 import CongVan from "../../../pages/AdminPages/CongVan"; // Import các trang admin khác
 import TaiKhoan from "../../../pages/AdminPages/TaiKhoan";

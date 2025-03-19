@@ -1,17 +1,15 @@
-import { Space, Table, Typography, Button, Modal, Input, Form, Select } from "antd";
+import { Space, Table, Typography, Button, Modal, Input, Form, Select, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { registerRoute, getAllUsers } from "../../../utils";
-
 import axios from "axios";
 
 export default function TaiKhoan() {
     const [isModalAddOpen, setIsModalAddOpen] = useState(false);
     const [dataSource, setDataSource] = useState([]);
-    const [form] = Form.useForm(); // Form Ant Design
-    const token = localStorage.getItem("token"); // Lấy token từ localStorage
+    const [form] = Form.useForm();
+    const token = localStorage.getItem("token");
 
-    // Hàm lấy danh sách người dùng từ API
+    // Lấy danh sách người dùng từ API
     const getAllUsers = async () => {
         try {
             const response = await axios.get("https://vks-website.onrender.com/api/users/", {
@@ -31,32 +29,40 @@ export default function TaiKhoan() {
     const handleCreateAccount = async () => {
         try {
             const values = await form.validateFields();
-            console.log("Dữ liệu gửi đi:", values); // Kiểm tra dữ liệu
+            if (!values.role) values.role = "user";
 
-            if (!values.role) {
-                values.role = "user"; // Gán giá trị mặc định nếu role bị undefined
-            }
-
-            const response = await axios.post("https://vks-website.onrender.com/api/users/register", values, {
+            await axios.post("https://vks-website.onrender.com/api/users/register", values, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            console.log("Phản hồi từ server:", response.data);
             toast.success("Tạo tài khoản thành công!");
             setIsModalAddOpen(false);
             form.resetFields();
             getAllUsers();
         } catch (error) {
-            console.error("Lỗi khi tạo tài khoản:", error.response?.data || error.message);
             toast.error("Lỗi khi tạo tài khoản!");
         }
     };
 
+    // Hàm xử lý xóa người dùng
+    const handleDeleteUser = async (id) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên này không?")) {
+            try {
+                await axios.delete(`https://vks-website.onrender.com/api/users/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
 
+                message.success("Xóa nhân viên thành công!");
+                getAllUsers(); // Cập nhật danh sách sau khi xóa
+            } catch (error) {
+                message.error("Lỗi khi xóa nhân viên!");
+            }
+        }
+    };
 
     return (
         <div>
-            <Space size={20} direction={"vertical"} style={{ width: "100%" }}>
+            <Space size={20} direction="vertical" style={{ width: "100%" }}>
                 <Space direction="horizontal" style={{ justifyContent: "space-between", width: "100%" }}>
                     <Typography.Title level={4}>Danh sách người dùng</Typography.Title>
                     <Button type="primary" onClick={() => setIsModalAddOpen(true)}>
@@ -66,11 +72,20 @@ export default function TaiKhoan() {
 
                 <Table
                     columns={[
-                        { key: '1', title: "ID", dataIndex: "_id" },
-                        { key: '2', title: "Tên", dataIndex: "username" },
-                        { key: '3', title: "Email", dataIndex: "email" },
-                        { key: '4', title: "Số điện thoại", dataIndex: "phone" },
-                        { key: '5', title: "Vai trò", dataIndex: "role" },
+                        { key: "1", title: "ID", dataIndex: "_id" },
+                        { key: "2", title: "Tên", dataIndex: "username" },
+                        { key: "3", title: "Email", dataIndex: "email" },
+                        { key: "4", title: "Số điện thoại", dataIndex: "phone" },
+                        { key: "5", title: "Vai trò", dataIndex: "role" },
+                        {
+                            key: "6",
+                            title: "Hành động",
+                            render: (text, record) => (
+                                <Button danger onClick={() => handleDeleteUser(record._id)}>
+                                    Xóa
+                                </Button>
+                            ),
+                        },
                     ]}
                     dataSource={dataSource}
                     rowKey="_id"
@@ -106,7 +121,6 @@ export default function TaiKhoan() {
                             <Select.Option value="admin">Admin</Select.Option>
                         </Select>
                     </Form.Item>
-
                 </Form>
             </Modal>
 
