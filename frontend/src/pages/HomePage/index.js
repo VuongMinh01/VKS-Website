@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Table, Button, Row, Col } from "antd";
 import axios from "axios";
+import { motion } from "framer-motion";
+import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 
 const API_URL = "https://vks-website.onrender.com/api/congvan/all";
+const MAX_LENGTH = 100; // Giới hạn ký tự hiển thị ban đầu
 
 export default function HomePage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [data, setData] = useState([]);
+    const [expandedRowKeys, setExpandedRowKeys] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,6 +40,14 @@ export default function HomePage() {
         navigate("/login");
     };
 
+    const toggleExpand = (record) => {
+        setExpandedRowKeys((prev) =>
+            prev.includes(record._id)
+                ? prev.filter((id) => id !== record._id)
+                : [...prev, record._id]
+        );
+    };
+
     const filteredData = data.filter((item) =>
         item.congVanTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.congVanContent.toLowerCase().includes(searchTerm.toLowerCase())
@@ -57,6 +69,33 @@ export default function HomePage() {
             title: "Nội dung",
             dataIndex: "congVanContent",
             key: "content",
+            render: (_, record) => {
+                const isExpanded = expandedRowKeys.includes(record._id);
+                const content = isExpanded
+                    ? record.congVanContent
+                    : record.congVanContent.slice(0, MAX_LENGTH) + (record.congVanContent.length > MAX_LENGTH ? "..." : "");
+
+                return (
+                    <div className="relative">
+                        <motion.div
+                            initial={{ height: "auto" }}
+                            animate={{ height: isExpanded ? "auto" : 60 }}
+                            exit={{ height: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                        >
+                            <p className="whitespace-pre-wrap">{content}</p>
+                        </motion.div>
+                        {record.congVanContent.length > MAX_LENGTH && (
+                            <Button
+                                type="link"
+                                onClick={() => toggleExpand(record)}
+                                icon={isExpanded ? <MinusOutlined /> : <PlusOutlined />}
+                            />
+                        )}
+                    </div>
+                );
+            },
         },
     ];
 
