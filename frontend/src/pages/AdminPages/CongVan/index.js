@@ -4,6 +4,7 @@ import axios from "axios";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from "react-toastify";
 
+
 const API_URL = "https://vks-website.onrender.com/api/congvan";
 
 export default function CongVan() {
@@ -27,15 +28,20 @@ export default function CongVan() {
     // 🔹 API: Lấy danh sách công văn
     const fetchCongVan = async () => {
         try {
+            console.log("🔄 Đang làm mới danh sách công văn...");
             const response = await axios.get(`${API_URL}/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDataSource(response.data);
+            console.log("✅ Dữ liệu công văn:", response.data); // ✅ In dữ liệu ra console
+            toast.success("Làm mới thành công!");
         } catch (error) {
-            console.error("Lỗi khi tải danh sách công văn:", error);
+            console.error("❌ Lỗi khi tải danh sách công văn:", error);
             toast.error("Lỗi tải danh sách công văn");
         }
     };
+
+
 
     // 🔹 API: Thêm công văn
     const handleAdd = async () => {
@@ -100,90 +106,7 @@ export default function CongVan() {
         }
     };
 
-    // return (
-    //     <div>
-    //         <Space size={20} direction={"vertical"}>
-    //             <Typography.Title level={4}>Danh sách công văn</Typography.Title>
-    //             <Button type="primary" onClick={() => setIsModalAddOpen(true)}>Thêm Công văn</Button>
 
-    //             {/* Bảng danh sách công văn */}
-    //             <Table
-    //                 columns={[
-    //                     { key: "0", title: "STT", render: (_, __, index) => index + 1, width: 80 },
-    //                     { key: "1", title: "Tiêu đề", dataIndex: "congVanTitle", width: "30%", ellipsis: true },
-    //                     { key: "2", title: "Nội dung", dataIndex: "congVanContent", width: "50%", ellipsis: true },
-    //                     {
-    //                         key: "3",
-    //                         title: "Actions",
-    //                         width: 150,
-    //                         render: (record) => (
-    //                             <>
-    //                                 <DeleteOutlined
-    //                                     onClick={() => handleDelete(record._id)}
-    //                                     style={{ color: "red", marginLeft: "12px" }}
-    //                                 />
-    //                                 <EditOutlined
-    //                                     onClick={() => {
-    //                                         setValues({ id: record._id, title: record.congVanTitle, content: record.congVanContent });
-    //                                         setIsModalUpdateOpen(true);
-    //                                     }}
-    //                                     style={{ color: "green", marginLeft: "15px" }}
-    //                                 />
-    //                             </>
-    //                         ),
-    //                     },
-    //                 ]}
-    //                 dataSource={dataSource}
-    //                 rowKey="_id"
-    //                 pagination={{ pageSize: 10 }}
-    //                 style={{ width: "100%" }} // ✅ Làm table chiếm hết ngang màn hình
-    //             />
-
-    //         </Space>
-
-    //         {/* Modal Thêm Công văn */}
-    //         <Modal
-    //             title="Thêm Công văn"
-    //             open={isModalAddOpen}
-    //             onOk={handleAdd}
-    //             onCancel={() => { setIsModalAddOpen(false); setValues({ id: "", title: "", content: "" }); }} // Reset form khi đóng
-    //         >
-    //             <Input
-    //                 placeholder="Tiêu đề công văn"
-    //                 value={values.title}
-    //                 onChange={(e) => setValues({ ...values, title: e.target.value })}
-    //                 style={{ marginBottom: "10px" }}
-    //             />
-    //             <Input
-    //                 placeholder="Nội dung công văn"
-    //                 value={values.content}
-    //                 onChange={(e) => setValues({ ...values, content: e.target.value })}
-    //             />
-    //         </Modal>
-
-    //         {/* Modal Cập nhật Công văn */}
-    //         <Modal
-    //             title="Cập nhật Công văn"
-    //             open={isModalUpdateOpen}
-    //             onOk={handleUpdate}
-    //             onCancel={() => { setIsModalUpdateOpen(false); setValues({ id: "", title: "", content: "" }); }} // Reset form khi đóng
-    //         >
-    //             <Input
-    //                 placeholder="Tiêu đề công văn"
-    //                 value={values.title}
-    //                 onChange={(e) => setValues({ ...values, title: e.target.value })}
-    //                 style={{ marginBottom: "10px" }}
-    //             />
-    //             <Input
-    //                 placeholder="Nội dung công văn"
-    //                 value={values.content}
-    //                 onChange={(e) => setValues({ ...values, content: e.target.value })}
-    //             />
-    //         </Modal>
-
-    //         <ToastContainer />
-    //     </div>
-    // );
     return (
         <div style={{ padding: 16 }}>
             <Space size={20} direction="vertical" style={{ width: "100%" }}>
@@ -197,9 +120,19 @@ export default function CongVan() {
                         gap: 10,
                     }}
                 >
-                    <Typography.Title level={4} style={{ margin: 0 }}>Danh sách công văn</Typography.Title>
-                    <Button type="primary">Thêm Công văn</Button>
+                    <Typography.Title level={4} style={{ margin: 0 }}>
+                        Danh sách công văn
+                    </Typography.Title>
+                    <Space>
+                        <Button type="default" onClick={fetchCongVan}>
+                            🔄 Làm mới
+                        </Button>
+                        <Button type="primary" onClick={() => setIsModalAddOpen(true)}>
+                            ➕ Thêm Công văn
+                        </Button>
+                    </Space>
                 </Space>
+
 
                 {/* Bảng danh sách công văn */}
                 <Table
@@ -247,6 +180,9 @@ export default function CongVan() {
                                         }}
                                         style={{ color: "green", cursor: "pointer" }}
                                     />
+
+
+
                                 </Space>
                             ),
                         },
@@ -258,6 +194,31 @@ export default function CongVan() {
                     style={{ width: "100%" }}
                 />
             </Space>
+
+            {/* Modal Thêm Công văn */}
+            <Modal
+                title="Thêm Công văn"
+                open={isModalAddOpen}
+                onOk={handleAdd}
+                onCancel={() => {
+                    setIsModalAddOpen(false);
+                    setValues({ id: "", title: "", content: "" }); // Reset form
+                }}
+            >
+                <Input
+                    placeholder="Tiêu đề công văn"
+                    value={values.title}
+                    onChange={(e) => setValues({ ...values, title: e.target.value })}
+                    style={{ marginBottom: 10 }}
+                />
+                <Input.TextArea
+                    placeholder="Nội dung công văn"
+                    value={values.content}
+                    onChange={(e) => setValues({ ...values, content: e.target.value })}
+                    autoSize={{ minRows: 3, maxRows: 6 }}
+                />
+            </Modal>
+
 
             {/* Modal Cập nhật Công văn */}
             <Modal

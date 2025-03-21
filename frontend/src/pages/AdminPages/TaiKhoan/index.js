@@ -149,7 +149,12 @@ export default function TaiKhoan() {
                 {/* Bảng danh sách người dùng */}
                 <Table
                     columns={[
-                        { key: "1", title: "ID", dataIndex: "_id", width: 100 },
+                        {
+                            key: "1",
+                            title: "STT",
+                            render: (_, __, index) => index + 1, // Hiển thị số thứ tự
+                            width: 80,
+                        },
                         { key: "2", title: "Tên", dataIndex: "username", width: 150 },
                         { key: "3", title: "Email", dataIndex: "email", width: 200 },
                         { key: "4", title: "Số điện thoại", dataIndex: "phone", width: 150 },
