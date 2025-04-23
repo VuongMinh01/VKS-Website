@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import connectDB from "./config/connectDB.js";  // ❗ Chỉ giữ dòng này, không cần `mongoose.connect()`
 import userRoutes from "./routes/v1/userRoute.js";
 import congVanRoutes from "./routes/v1/congVanRoute.js";
+import khoHangRoutes from "./routes/v1/khoHangRoute.js";
+
 import axios from "axios";
 
 // Load biến môi trường từ .env
@@ -33,6 +35,8 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/congvan", congVanRoutes);
+app.use("/api/khohang", khoHangRoutes);
+
 
 // Route test API
 app.get("/", (req, res) => {
