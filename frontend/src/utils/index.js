@@ -9,3 +9,8 @@ export const addCongVanRoute = `${host}/congvan/add`;        // Thêm công văn
 export const deleteCongVanRoute = `${host}/congvan/delete/`; // Xóa công văn (cần thêm ID)
 export const updateCongVanRoute = `${host}/congvan/update/`; // Cập nhật công văn (cần thêm ID)
 export const searchCongVanRoute = `${host}/congvan/search`;
+
+export const addKhoHang = `${host}/khohang/add`;
+export const deleteKhoHang = `${host}/khohang/delete/`;
+export const updateKhoHang = `${host}/khohang/update/`;
+export const searchKhoHang = `${host}/khohang/search`;

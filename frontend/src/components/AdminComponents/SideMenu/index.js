@@ -60,6 +60,16 @@ export default function SideMenu() {
                         key: "/admin/taikhoan",
                     },
                     {
+                        label: "Kho hàng",
+                        icon: <DatabaseOutlined />,
+                        key: "/admin/khohang",
+                    },
+                    {
+                        label: "Danh sách phiếu kho hàng",
+                        icon: <DatabaseOutlined />,
+                        key: "/admin/phieukhohang",
+                    },
+                    {
                         label: "Đăng xuất",
                         key: "/signout",
                         icon: <LogoutOutlined />,
