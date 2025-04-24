@@ -38,8 +38,7 @@ app.use("/api/congvan", congVanRoutes);
 app.use("/api/khohang", khoHangRoutes);
 app.use("/api/sanpham", sanPhamRoutes);
 
-import sanPhamRoute from "./routes/khohang/sanpham.js";
-app.use("/api/khohang/sanpham", sanPhamRoute);
+
 
 
 // Route test API

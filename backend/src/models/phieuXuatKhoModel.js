@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 const phieuXuatKhoSchema = new mongoose.Schema({
     maPhieu: {
         type: String,
@@ -8,15 +6,18 @@ const phieuXuatKhoSchema = new mongoose.Schema({
     },
     sanPham: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "SanPham",
-            required: true
+            sanPham: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "SanPham",
+                required: true
+            },
+            soLuong: {
+                type: Number,
+                required: true,
+                min: 1
+            }
         }
     ],
-    soLuongXuat: {
-        type: Number,
-        required: true
-    },
     nguoiXuat: {
         type: String,
         required: true
