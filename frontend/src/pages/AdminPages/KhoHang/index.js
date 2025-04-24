@@ -1,276 +1,252 @@
-import { Table, Typography, Button, Space, Modal, Form, Input, InputNumber, Select } from "antd";
+import { Modal, Form, InputNumber, Select, Button, Input, Table } from "antd";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
 const API_URL = "https://vks-website.onrender.com/api/khohang";
 
-export default function KhoHang() {
-    const [dataSource, setDataSource] = useState([]);
+export default function KhoHangForm() {
+    const [form] = Form.useForm();
+    const [sanPhamList, setSanPhamList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [openAdd, setOpenAdd] = useState(false);
-    const [openUpdate, setOpenUpdate] = useState(false); // Modal cập nhật
-    const [formAdd] = Form.useForm();
-    const [formUpdate] = Form.useForm(); // Form cho cập nhật
-    const [currentItem, setCurrentItem] = useState(null); // Dữ liệu mặt hàng hiện tại
-    const token = localStorage.getItem("token");
+    const [phieuList, setPhieuList] = useState([]);
+    const [operationType, setOperationType] = useState('add'); // 'add' cho thêm phiếu nhập, 'export' cho phiếu xuất
+    const [modalVisible, setModalVisible] = useState(false); // Trạng thái hiển thị modal
 
     useEffect(() => {
-        fetchKhoHang();
+        fetchSanPhamList();
+        fetchPhieuList();
     }, []);
 
-    const fetchKhoHang = async () => {
+    // Hàm lấy token từ localStorage
+    const getToken = () => {
+        return localStorage.getItem('token');
+    };
+
+    const fetchSanPhamList = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const response = await axios.get(`${API_URL}/all`, {
-                headers: { Authorization: `Bearer ${token}` },
+            const token = getToken();
+            const response = await axios.get("https://vks-website.onrender.com/api/sanpham/all", {
+                headers: {
+                    Authorization: `Bearer ${token}` // Thêm token vào header
+                }
             });
-            setDataSource(response.data);
+            console.log("Dữ liệu sản phẩm:", response.data);
+            setSanPhamList(response.data);
         } catch (err) {
-            toast.error("Không thể tải danh sách kho hàng");
+            toast.error("Không thể tải danh sách sản phẩm");
+            console.error("Lỗi tải sản phẩm:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleAddKho = async () => {
+    const fetchPhieuList = async () => {
         try {
-            const values = await formAdd.validateFields();
-            const response = await axios.post(`${API_URL}/add`, values, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setDataSource([...dataSource, response.data.khoHang]);
-            toast.success("Thêm mặt hàng thành công!");
-            formAdd.resetFields();
-            setOpenAdd(false);
+            const token = getToken();
+            const [phieuNhapRes, phieuXuatRes] = await Promise.all([
+                axios.get(`${API_URL}/phieunhap`, {
+                    headers: {
+                        Authorization: `Bearer ${token}` // Thêm token vào header
+                    }
+                }),
+                axios.get(`${API_URL}/phieuxuat`, {
+                    headers: {
+                        Authorization: `Bearer ${token}` // Thêm token vào header
+                    }
+                })
+            ]);
+            setPhieuList([...phieuNhapRes.data, ...phieuXuatRes.data]);
         } catch (err) {
-            toast.error("Không thể thêm mặt hàng");
+            toast.error("Không thể tải danh sách phiếu");
+            console.error("Lỗi khi tải danh sách phiếu:", err);
         }
     };
 
-    const handleDeleteKho = async (id) => {
-        // Sử dụng window.confirm() để xác nhận việc xoá
-        const confirmed = window.confirm("Bạn có chắc muốn xoá mặt hàng này?");
-        if (confirmed) {
-            try {
-                const response = await axios.delete(`${API_URL}/delete/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+    const generateMaPhieu = () => {
+        const filteredPhieu = phieuList.filter(phieu =>
+            phieu.maPhieu.startsWith(operationType === 'add' ? 'PNK' : 'PXK')
+        );
 
-                if (response.status === 200) {
-                    setDataSource(dataSource.filter((item) => item._id !== id));
-                    toast.success("Xoá thành công");
-                } else {
-                    toast.error("Xoá không thành công");
+        let maxNumber = 0;
+        if (filteredPhieu.length > 0) {
+            maxNumber = filteredPhieu.reduce((max, phieu) => {
+                const number = parseInt(phieu.maPhieu.slice(3), 10);
+                return number > max ? number : max;
+            }, 0);
+        }
+
+        return operationType === 'add' ? `PNK${String(maxNumber + 1).padStart(3, '0')}` : `PXK${String(maxNumber + 1).padStart(3, '0')}`;
+    };
+
+    const handleOpenAdd = (operation) => {
+        setOperationType(operation);
+        const newMaPhieu = generateMaPhieu(); // Gán mã phiếu tự động khi mở modal
+        form.setFieldsValue({ maPhieu: newMaPhieu }); // Set mã phiếu vào form
+        setModalVisible(true);
+    };
+
+    const handleSubmitNhapKho = async () => {
+        try {
+            const values = await form.validateFields();
+            console.log("Dữ liệu gửi lên:", values); // In log để kiểm tra
+
+            // Kiểm tra số lượng hợp lệ cho phiếu nhập kho
+            if (isNaN(values.soLuongNhap) || values.soLuongNhap <= 0) {
+                toast.error("Số lượng nhập phải là một số hợp lệ và lớn hơn 0");
+                return;
+            }
+
+            values.maPhieu = generateMaPhieu(); // Gán mã phiếu tự động
+            const token = getToken(); // Lấy token từ localStorage
+
+            // Gửi yêu cầu POST với token trong header
+            await axios.post(API_URL + "/phieunhap", values, {
+                headers: {
+                    Authorization: `Bearer ${token}` // Thêm token vào header
                 }
-            } catch (err) {
-                toast.error("Xoá không thành công");
+            });
+
+            toast.success("Thêm phiếu nhập kho thành công!");
+            setModalVisible(false);
+            fetchPhieuList();
+        } catch (err) {
+            if (err.response) {
+                console.error("Lỗi khi thêm phiếu nhập kho:", err.response.data);
+                toast.error(`Lỗi: ${err.response.data.message || 'Không thể thêm phiếu'}`);
+            } else {
+                console.error("Lỗi khi thêm phiếu nhập kho:", err);
+                toast.error("Không thể kết nối với máy chủ.");
             }
         }
     };
 
-    const handleUpdateKho = async () => {
+    const handleSubmitXuatKho = async () => {
         try {
-            const values = await formUpdate.validateFields();
-            const response = await axios.put(`${API_URL}/update/${currentItem._id}`, values, {
-                headers: { Authorization: `Bearer ${token}` },
+            const values = await form.validateFields();
+            console.log("Dữ liệu gửi lên:", values); // In log để kiểm tra
+
+            // Kiểm tra số lượng tồn kho cho phiếu xuất kho
+            const sanPhamWithQuantity = values.sanPham.map(sanPhamId => ({
+                sanPhamId,
+                soLuong: values[`soLuong_${sanPhamId}`]  // Giả sử bạn có tên trường `soLuong_sanPhamId` cho từng sản phẩm
+            }));
+
+            for (let { sanPhamId, soLuong } of sanPhamWithQuantity) {
+                const sanPham = await axios.get(`https://vks-website.onrender.com/api/sanpham/${sanPhamId}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (sanPham.data.soLuongTon < soLuong) {
+                    toast.error(`Sản phẩm ${sanPham.data.tenSanPham} không đủ số lượng để xuất.`);
+                    return;
+                }
+            }
+
+            // Gán mã phiếu tự động
+            values.maPhieu = generateMaPhieu();
+
+            // Chuyển đổi danh sách sản phẩm và số lượng
+            const sanPhamList = sanPhamWithQuantity.map(item => ({
+                sanPham: item.sanPhamId,
+                soLuong: item.soLuong
+            }));
+
+            // Gửi yêu cầu POST với token trong header
+            const token = getToken();
+            await axios.post(API_URL + "/phieuxuat", {
+                ...values,
+                sanPham: sanPhamList  // Gửi danh sách sản phẩm với số lượng
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}` // Thêm token vào header
+                }
             });
-            setDataSource(dataSource.map(item => item._id === currentItem._id ? response.data.khoHang : item));
-            toast.success("Cập nhật thành công!");
-            formUpdate.resetFields();
-            setOpenUpdate(false);
+
+            toast.success("Thêm phiếu xuất kho thành công!");
+            setModalVisible(false);
+            fetchPhieuList();
         } catch (err) {
-            toast.error("Không thể cập nhật mặt hàng");
+            if (err.response) {
+                console.error("Lỗi khi thêm phiếu xuất kho:", err.response.data);
+                toast.error(`Lỗi: ${err.response.data.message || 'Không thể thêm phiếu'}`);
+            } else {
+                console.error("Lỗi khi thêm phiếu xuất kho:", err);
+                toast.error("Không thể kết nối với máy chủ.");
+            }
         }
     };
 
-    const handleOpenUpdate = (item) => {
-        setCurrentItem(item);
-        formUpdate.setFieldsValue({
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            type: item.type,
-        });
-        setOpenUpdate(true);
-    };
 
-    const columns = [
-        {
-            title: "STT",
-            key: "index",
-            render: (_, __, index) => index + 1,
-            width: 60,
-        },
-        {
-            title: "Tên hàng",
-            dataIndex: "name",
-            key: "name",
-        },
-        {
-            title: "Số lượng",
-            dataIndex: "quantity",
-            key: "quantity",
-        },
-        {
-            title: "Đơn giá",
-            dataIndex: "price",
-            key: "price",
-        },
-        {
-            title: "Loại hàng",
-            dataIndex: "type",
-            key: "type",
-        },
-        {
-            title: "Hành động",
-            key: "action",
-            render: (_, record) => (
-                <>
-                    <Button onClick={() => handleOpenUpdate(record)} style={{ marginRight: 8 }}>
-                        Cập nhật
-                    </Button>
-                    <Button danger onClick={() => handleDeleteKho(record._id)}>
-                        Xoá
-                    </Button>
-                </>
-            ),
-        },
-    ];
 
     return (
-        <div style={{ padding: 16 }}>
-            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                <Space style={{ justifyContent: "space-between", width: "100%", flexWrap: "wrap" }}>
-                    <Typography.Title level={4} style={{ margin: 0 }}>
-                        Danh sách kho hàng
-                    </Typography.Title>
-                    <Space>
-                        <Button onClick={fetchKhoHang}>🔄 Làm mới</Button>
-                        <Button type="primary" onClick={() => setOpenAdd(true)}>➕ Thêm mặt hàng</Button>
-                    </Space>
-                </Space>
-
-                <Table
-                    columns={columns}
-                    dataSource={dataSource}
-                    loading={loading}
-                    rowKey="_id"
-                    pagination={{ pageSize: 10 }}
-                    scroll={{ x: "max-content" }}
-                />
-            </Space>
-
-            {/* Modal thêm mặt hàng */}
+        <div>
+            <Button onClick={() => handleOpenAdd('add')}>Thêm Phiếu Nhập Kho</Button>
+            <Button onClick={() => handleOpenAdd('export')}>Thêm Phiếu Xuất Kho</Button>
             <Modal
-                title="Thêm mặt hàng mới"
-                open={openAdd}
-                onCancel={() => setOpenAdd(false)}
-                onOk={handleAddKho}
+                title={operationType === 'add' ? "Thêm Phiếu Nhập Kho" : "Thêm Phiếu Xuất Kho"}
+                visible={modalVisible}
+                onCancel={() => setModalVisible(false)}
+                onOk={operationType === 'add' ? handleSubmitNhapKho : handleSubmitXuatKho}
                 okText="Thêm"
                 cancelText="Huỷ"
-                destroyOnClose
             >
-                <Form form={formAdd} layout="vertical">
+                <Form form={form} layout="vertical">
                     <Form.Item
-                        label="ID"
-                        name="id"
-                        rules={[{ required: true, message: "Vui lòng nhập ID!" }]}
+                        label="Mã phiếu"
+                        name="maPhieu"
+                        rules={[{ required: true, message: "Vui lòng nhập mã phiếu!" }]}
                     >
-                        <Input placeholder="Nhập ID mặt hàng" />
+                        <InputNumber style={{ width: "100%" }} disabled />
                     </Form.Item>
 
                     <Form.Item
-                        label="Tên hàng"
-                        name="name"
-                        rules={[{ required: true, message: "Vui lòng nhập tên hàng!" }]}
+                        label="Chọn sản phẩm"
+                        name="sanPham"
+                        rules={[{ required: true, message: "Vui lòng chọn sản phẩm!" }]}
                     >
-                        <Input placeholder="Nhập tên hàng" />
+                        <Select mode="multiple" placeholder="Chọn sản phẩm" loading={loading}>
+                            {sanPhamList.length > 0 ? (
+                                sanPhamList.map((item) => (
+                                    <Select.Option key={item._id} value={item._id}>
+                                        {item.tenSanPham}
+                                    </Select.Option>
+                                ))
+                            ) : (
+                                <Select.Option value="0">Không có sản phẩm</Select.Option>
+                            )}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item
                         label="Số lượng"
-                        name="quantity"
+                        name="soLuongNhap"
                         rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
                     >
                         <InputNumber min={1} style={{ width: "100%" }} />
                     </Form.Item>
+
                     <Form.Item
-                        label="Đơn giá"
-                        name="price"
-                        rules={[{ required: true, message: "Vui lòng nhập đơn giá!" }]}
+                        label={operationType === 'add' ? "Người nhập" : "Người xuất"}
+                        name="nguoiNhap"
+                        rules={[{ required: true, message: "Vui lòng nhập tên người!" }]}
                     >
-                        <InputNumber min={0} style={{ width: "100%" }} />
+                        <Input placeholder={`Nhập tên người ${operationType === 'add' ? "nhập" : "xuất"}`} />
                     </Form.Item>
-                    <Form.Item
-                        label="Loại hàng"
-                        name="type"
-                        rules={[{ required: true, message: "Vui lòng chọn loại hàng!" }]}
-                    >
-                        <Select placeholder="Chọn loại hàng">
-                            <Select.Option value="văn phòng phẩm">Văn phòng phẩm</Select.Option>
-                            <Select.Option value="thiết bị">Thiết bị</Select.Option>
-                            <Select.Option value="khác">Khác</Select.Option>
-                        </Select>
-                    </Form.Item>
+
                 </Form>
             </Modal>
 
-            {/* Modal cập nhật mặt hàng */}
-            <Modal
-                title="Cập nhật mặt hàng"
-                open={openUpdate}
-                onCancel={() => setOpenUpdate(false)}
-                onOk={handleUpdateKho}
-                okText="Cập nhật"
-                cancelText="Huỷ"
-                destroyOnClose
-            >
-                <Form form={formUpdate} layout="vertical">
-                    <Form.Item
-                        label="ID"
-                        name="id"
-                        rules={[{ required: true, message: "Vui lòng nhập ID!" }]}
-                    >
-                        <Input disabled placeholder="ID mặt hàng" />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Tên hàng"
-                        name="name"
-                        rules={[{ required: true, message: "Vui lòng nhập tên hàng!" }]}
-                    >
-                        <Input placeholder="Nhập tên hàng" />
-                    </Form.Item>
-                    <Form.Item
-                        label="Số lượng"
-                        name="quantity"
-                        rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
-                    >
-                        <InputNumber min={1} style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item
-                        label="Đơn giá"
-                        name="price"
-                        rules={[{ required: true, message: "Vui lòng nhập đơn giá!" }]}
-                    >
-                        <InputNumber min={0} style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item
-                        label="Loại hàng"
-                        name="type"
-                        rules={[{ required: true, message: "Vui lòng chọn loại hàng!" }]}
-                    >
-                        <Select placeholder="Chọn loại hàng">
-                            <Select.Option value="văn phòng phẩm">Văn phòng phẩm</Select.Option>
-                            <Select.Option value="thiết bị">Thiết bị</Select.Option>
-                            <Select.Option value="khác">Khác</Select.Option>
-                        </Select>
-                    </Form.Item>
-                </Form>
-            </Modal>
-
-            <ToastContainer />
+            <Table
+                dataSource={phieuList}
+                columns={[
+                    { title: "Mã Phiếu", dataIndex: "maPhieu" },
+                    { title: "Ngày", dataIndex: "ngayNhap", render: date => new Date(date).toLocaleString() },
+                    { title: "Sản phẩm", dataIndex: "sanPham", render: products => products.map(p => p.tenSanPham).join(", ") },
+                    { title: "Số Lượng", dataIndex: "soLuongNhap" }
+                ]}
+            />
         </div>
     );
 }

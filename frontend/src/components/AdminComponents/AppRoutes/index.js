@@ -8,6 +8,7 @@ import PrivateRoute from "../../PrivateRoute"; // Import PrivateRoute để bả
 import CongVan from "../../../pages/AdminPages/CongVan"; // Import các trang admin khác
 import TaiKhoan from "../../../pages/AdminPages/TaiKhoan";
 import KhoHang from "../../../pages/AdminPages/KhoHang";
+import SanPham from "../../../pages/AdminPages/SanPham";
 
 export default function AppRoutes() {
     return (
@@ -43,6 +44,14 @@ export default function AppRoutes() {
                 element={
                     <PrivateRoute role="admin">
                         <KhoHang />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/sanpham"
+                element={
+                    <PrivateRoute role="admin">
+                        <SanPham />
                     </PrivateRoute>
                 }
             />

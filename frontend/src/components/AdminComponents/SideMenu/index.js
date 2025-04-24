@@ -65,9 +65,9 @@ export default function SideMenu() {
                         key: "/admin/khohang",
                     },
                     {
-                        label: "Danh sách phiếu kho hàng",
+                        label: "Danh sách sản phẩm",
                         icon: <DatabaseOutlined />,
-                        key: "/admin/phieukhohang",
+                        key: "/admin/sanpham",
                     },
                     {
                         label: "Đăng xuất",

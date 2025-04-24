@@ -14,3 +14,8 @@ export const addKhoHang = `${host}/khohang/add`;
 export const deleteKhoHang = `${host}/khohang/delete/`;
 export const updateKhoHang = `${host}/khohang/update/`;
 export const searchKhoHang = `${host}/khohang/search`;
+
+export const addSanPham = `${host}/khohang/add`;
+export const deleteSanPham = `${host}/sanpham/delete/`;
+export const updateSanPham = `${host}/sanpham/update/`;
+export const searchSanPham = `${host}/sanpham/search`;
