@@ -5,7 +5,7 @@ import connectDB from "./config/connectDB.js";  // ❗ Chỉ giữ dòng này, k
 import userRoutes from "./routes/v1/userRoute.js";
 import congVanRoutes from "./routes/v1/congVanRoute.js";
 import khoHangRoutes from "./routes/v1/khoHangRoute.js";
-
+import sanPhamRoutes from "./routes/v1/sanPhamRoute.js"
 import axios from "axios";
 
 // Load biến môi trường từ .env
@@ -36,6 +36,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/congvan", congVanRoutes);
 app.use("/api/khohang", khoHangRoutes);
+app.use("/api/sanpham", sanPhamRoutes);
 
 
 // Route test API
