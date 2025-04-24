@@ -1,14 +1,17 @@
+import mongoose from "mongoose";
+
 const phieuXuatKhoSchema = new mongoose.Schema({
     maPhieu: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
     },
     sanPham: [
         {
             sanPham: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "SanPham",
+                ref: "SanPham",  // Liên kết với model SanPham
                 required: true
             },
             soLuong: {
@@ -19,7 +22,7 @@ const phieuXuatKhoSchema = new mongoose.Schema({
         }
     ],
     nguoiXuat: {
-        type: String,
+        type: String,  // Tên người xuất kho
         required: true
     },
     ngayXuat: {
