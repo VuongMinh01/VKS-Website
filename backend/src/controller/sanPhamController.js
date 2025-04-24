@@ -80,8 +80,6 @@ export const getAllSanPham = async (req, res) => {
         return res.status(500).json({ message: "Lỗi server!", error: error.message });
     }
 };
-import SanPham from '../models/SanPham.js';
-
 export const getSanPhamById = async (req, res) => {
     try {
         const sanPham = await SanPham.findById(req.params.id);

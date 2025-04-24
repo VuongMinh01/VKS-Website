@@ -4,7 +4,8 @@ import {
     deleteSanPham,
     updateSanPham,
     searchSanPham,
-    getAllSanPham
+    getAllSanPham,
+    getSanPhamById
 } from "../../controller/sanPhamController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 
@@ -16,5 +17,6 @@ router.delete("/delete/:id", verifyToken, deleteSanPham); // Xóa sản phẩm
 router.put("/update/:id", verifyToken, updateSanPham);    // Cập nhật sản phẩm
 router.get("/search", verifyToken, searchSanPham);        // Tìm kiếm sản phẩm
 router.get("/all", verifyToken, getAllSanPham);           // Lấy tất cả sản phẩm
+router.get('/:id', verifyToken, getSanPhamById);
 
 export default router;
