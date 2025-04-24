@@ -38,6 +38,8 @@ app.use("/api/congvan", congVanRoutes);
 app.use("/api/khohang", khoHangRoutes);
 app.use("/api/sanpham", sanPhamRoutes);
 
+app.use('/api/khohang/sanpham', sanPhamRoute);
+
 
 // Route test API
 app.get("/", (req, res) => {
