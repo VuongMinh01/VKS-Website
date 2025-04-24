@@ -23,9 +23,14 @@ export const addPhieuXuatKho = async (req, res) => {
         }
 
         // Chuyển đổi ID sản phẩm từ string sang ObjectId
+        // Kiểm tra và chuyển đổi ID sản phẩm sang ObjectId
         sanPham.forEach(item => {
+            if (!mongoose.Types.ObjectId.isValid(item.sanPham)) {
+                throw new Error(`ID không hợp lệ: ${item.sanPham}`);
+            }
             item.sanPham = new mongoose.Types.ObjectId(item.sanPham);
         });
+
 
         // Lấy danh sách sản phẩm từ DB
         const sanPhamIds = sanPham.map(item => item.sanPham);
